@@ -1,0 +1,43 @@
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS sp_new_currency_case; //
+
+CREATE PROCEDURE sp_new_currency_case( 
+    IN P_currency_name VARCHAR(45), 
+    IN P_currency_symbol VARCHAR(45), 
+    IN P_exchange_rate DECIMAL(15,2), 
+    IN P_country VARCHAR(45),
+    IN P_iso_code VARCHAR(45)
+)
+BEGIN
+    /* Declaraciones  */
+    DECLARE _currency_name VARCHAR(45);
+    DECLARE _currency_symbol VARCHAR(45);
+    DECLARE _exchange_rate DECIMAL(15,2);
+    DECLARE _country VARCHAR(45);
+    DECLARE _iso_code VARCHAR(45);
+
+    /*  valores */
+    SET _currency_name = P_currency_name;
+    SET _currency_symbol = P_currency_symbol;
+    SET _exchange_rate = P_exchange_rate;
+    SET _country = P_country;
+    SET _iso_code = P_iso_code;
+
+    /* Asignación del símbolo según el nombre de la moneda */
+    CASE
+        WHEN _currency_name LIKE '%dólar%' THEN SET _currency_symbol = '$';
+        WHEN _currency_name LIKE '%peso%' THEN SET _currency_symbol = 'P';
+        WHEN _currency_name LIKE '%yen%' THEN SET _currency_symbol = '¥';
+        WHEN _currency_name LIKE '%euro%' THEN SET _currency_symbol = '€';
+        ELSE SET _currency_symbol = P_currency_symbol;
+    END CASE;
+
+    /*  tabla */
+    INSERT INTO currencies (currency_name, currency_symbol, exchange_rate, country, ISO_CODE)
+    VALUES (_currency_name, _currency_symbol, _exchange_rate, _country, _iso_code);
+
+    COMMIT;
+END //
+
+DELIMITER ;
